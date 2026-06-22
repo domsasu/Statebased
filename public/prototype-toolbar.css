@@ -1,0 +1,315 @@
+/**
+ * Prototype Toolbar — styles
+ *
+ * All values are themable via CSS custom properties on .proto-toolbar.
+ * Default look matches the dark-pill style used in Coursera prototypes.
+ */
+
+.proto-toolbar {
+  /* Theme tokens — override on .proto-toolbar to recolor */
+  --pt-bg: #1f1f1f;
+  --pt-bg-hover: #2d3038;
+  --pt-text: #ffffff;
+  --pt-accent: #0056d2;
+  --pt-accent-hover: #003d99;
+  --pt-accent-soft: #ebf2fb;
+  --pt-accent-soft-strong: #d6e4f7;
+  --pt-surface: #ffffff;
+  --pt-surface-text: #1f1f1f;
+  --pt-text-secondary: #5a5e6b;
+  --pt-text-muted: #a0a4ad;
+  --pt-border: #e6e7ea;
+  --pt-warn-bg: #fff8e1;
+  --pt-warn-text: #6f4f00;
+  --pt-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --pt-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --pt-radius-sm: 4px;
+  --pt-radius-md: 8px;
+  --pt-radius-lg: 16px;
+  --pt-highlight: #d4351c;
+  --pt-font: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pt-font);
+}
+
+/* ─── Buttons (shared) ──────────────────────────────────────────── */
+.proto-toolbar__btn {
+  height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-bg);
+  color: var(--pt-text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--pt-shadow-md);
+  transition: background 0.2s;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.proto-toolbar__btn:hover { background: var(--pt-bg-hover); color: var(--pt-text); }
+.proto-toolbar__btn--icon { width: 40px; padding: 0; justify-content: center; }
+.proto-toolbar__btn .material-symbols-rounded { font-size: 20px; }
+
+/* Tooltip on icon buttons */
+.proto-toolbar [data-tooltip] { position: relative; }
+.proto-toolbar [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  background: var(--pt-bg);
+  color: var(--pt-text);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  border-radius: var(--pt-radius-sm);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.proto-toolbar [data-tooltip]:hover::after { opacity: 1; }
+.proto-toolbar__tools.is-open [data-tooltip]:hover::after,
+.proto-toolbar__features-trigger[aria-pressed="true"]::after { opacity: 0 !important; }
+
+/* ─── Experiment dropdown ───────────────────────────────────────── */
+.proto-toolbar__exp { position: relative; }
+.proto-toolbar__exp-trigger { padding: 8px 12px; }
+.proto-toolbar__exp-trigger .material-symbols-rounded:last-child {
+  font-size: 18px;
+  color: var(--pt-text-muted);
+  margin-left: 2px;
+  transition: transform 0.2s;
+}
+.proto-toolbar__exp.is-open .proto-toolbar__exp-trigger .material-symbols-rounded:last-child {
+  transform: rotate(180deg);
+}
+
+.proto-toolbar__exp-menu {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  background: var(--pt-surface);
+  border-radius: var(--pt-radius-lg);
+  box-shadow: var(--pt-shadow-md);
+  z-index: 10001;
+}
+.proto-toolbar__exp.is-open .proto-toolbar__exp-menu { display: block; }
+
+.proto-toolbar__exp-option {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--pt-surface-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.proto-toolbar__exp-option:hover {
+  background: var(--pt-accent-soft);
+  color: var(--pt-accent-hover);
+}
+.proto-toolbar__exp-option.is-selected {
+  color: var(--pt-accent);
+  font-weight: 600;
+}
+
+/* ─── Triggers flyout ───────────────────────────────────────────── */
+.proto-toolbar__tools { position: relative; }
+.proto-toolbar__tools-flyout {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+  background: var(--pt-surface);
+  border-radius: var(--pt-radius-lg);
+  box-shadow: var(--pt-shadow-md);
+  padding: 8px 0;
+  z-index: 10000;
+  flex-direction: column;
+}
+.proto-toolbar__tools.is-open .proto-toolbar__tools-trigger { background: var(--pt-accent); }
+.proto-toolbar__tools.is-open .proto-toolbar__tools-trigger:hover { background: var(--pt-accent-hover); }
+.proto-toolbar__tools.is-open .proto-toolbar__tools-flyout { display: flex; }
+
+.proto-toolbar__tools-header {
+  padding: 8px 16px 4px;
+  color: var(--pt-text-secondary);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.proto-toolbar__tools-row {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: var(--pt-surface-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  text-align: left;
+}
+.proto-toolbar__tools-row:hover {
+  background: var(--pt-accent-soft);
+  color: var(--pt-accent-hover);
+}
+.proto-toolbar__tools-row .material-symbols-rounded { font-size: 20px; flex-shrink: 0; }
+.proto-toolbar__tools-row.is-disabled {
+  color: var(--pt-text-muted);
+  cursor: not-allowed;
+}
+.proto-toolbar__tools-row.is-disabled:hover { background: none; color: var(--pt-text-muted); }
+
+/* ─── Features list overlay ─────────────────────────────────────── */
+.proto-toolbar__features-overlay {
+  display: none;
+  position: fixed;
+  bottom: 72px;
+  left: 16px;
+  width: 400px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--pt-surface);
+  border-radius: var(--pt-radius-lg);
+  box-shadow: var(--pt-shadow-lg);
+  z-index: 10002;
+  flex-direction: column;
+  padding: 0;
+}
+.proto-toolbar__features-overlay.is-open { display: flex; }
+
+.proto-toolbar__features-trigger[aria-pressed="true"] { background: var(--pt-accent); }
+.proto-toolbar__features-trigger[aria-pressed="true"]:hover { background: var(--pt-accent-hover); }
+
+.proto-toolbar__features-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  background: var(--pt-surface);
+  z-index: 1;
+  border-bottom: 1px solid var(--pt-border);
+}
+.proto-toolbar__features-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pt-surface-text);
+}
+.proto-toolbar__features-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  border-radius: var(--pt-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pt-text-secondary);
+  transition: background 0.15s;
+}
+.proto-toolbar__features-close:hover { background: var(--pt-border); }
+.proto-toolbar__features-close .material-symbols-rounded { font-size: 20px; }
+
+.proto-toolbar__features-notice {
+  margin: 8px 16px 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--pt-warn-text);
+  background: var(--pt-warn-bg);
+  border-radius: var(--pt-radius-sm);
+}
+
+.proto-toolbar__features-empty {
+  padding: 24px 20px;
+  font-size: 13px;
+  color: var(--pt-text-secondary);
+}
+
+.proto-toolbar__features-section-title {
+  padding: 12px 20px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pt-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.proto-toolbar__features-list { list-style: none; margin: 0; padding: 0 8px 4px; }
+.proto-toolbar__features-sublist { list-style: none; margin: 0; padding: 0 0 0 20px; }
+
+.proto-toolbar__features-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--pt-radius-md);
+  cursor: default;
+  transition: background 0.15s, color 0.15s;
+  font-size: 13px;
+  color: var(--pt-surface-text);
+  line-height: 1.45;
+}
+.proto-toolbar__features-bullet {
+  width: 5px;
+  height: 5px;
+  min-width: 5px;
+  border-radius: 50%;
+  background: var(--pt-text-muted);
+  margin-top: 7px;
+}
+.proto-toolbar__features-item.is-clickable { cursor: pointer; }
+.proto-toolbar__features-item.is-clickable:hover {
+  background: var(--pt-accent-soft);
+  color: var(--pt-accent-hover);
+}
+.proto-toolbar__features-item.is-clickable:hover .proto-toolbar__features-bullet {
+  background: var(--pt-accent);
+}
+.proto-toolbar__features-item.is-active {
+  background: var(--pt-accent-soft-strong) !important;
+  color: var(--pt-accent-hover) !important;
+}
+.proto-toolbar__features-item.is-active .proto-toolbar__features-bullet {
+  background: var(--pt-accent) !important;
+  width: 7px;
+  height: 7px;
+  min-width: 7px;
+  margin-top: 6px;
+}
+
+/* Highlight ring on the page element a feature points to */
+.proto-feature-hl {
+  outline: 3px solid var(--pt-highlight, #d4351c) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 12px rgba(212, 53, 28, 0.25) !important;
+  transition: outline 0.2s, box-shadow 0.2s !important;
+}
