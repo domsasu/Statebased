@@ -56,7 +56,6 @@ export const VARIANT_LAYOUTS: Record<VariantId, LayoutItem[]> = {
     { id: 'course-recs-1', name: 'Course recommendations' },
     { id: 'trending-now', name: 'Course recommendations' },
     { id: 'in-demand-skills', name: 'Skills' },
-    { id: 'microform-content', name: 'Microform content' },
     { id: 'career-overview', name: 'Career overview' },
     { id: 'ai-search-overview', name: 'AI Search/Unblocking' },
   ],
