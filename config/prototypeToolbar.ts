@@ -12,6 +12,7 @@ export type PrototypeExperimentId = 'a' | 'b' | 'c' | 'd';
 
 declare global {
   interface Window {
+    __getProtoLayouts?: () => Record<string, unknown[]>;
     PrototypeToolbar?: {
       init: (config: Record<string, unknown>) => void;
       getExperiment: () => string | null;
@@ -157,6 +158,23 @@ export function buildPrototypeToolbarConfig(): Record<string, unknown> {
         onClick: () => {
           document.body.classList.add('proto-hifi');
           document.body.classList.remove('proto-midfi');
+        },
+      },
+      {
+        label: 'Save layout',
+        icon: 'save',
+        onClick: () => {
+          const layouts = window.__getProtoLayouts?.();
+          if (!layouts || Object.keys(layouts).length === 0) {
+            alert('No layout changes to save — drag blocks first, then click Save layout.');
+            return;
+          }
+          const json = JSON.stringify(layouts, null, 2);
+          navigator.clipboard.writeText(json).then(() => {
+            alert('Layout JSON copied to clipboard!\n\nPaste it to Claude and say "save this as default" to write it into the config file.');
+          }).catch(() => {
+            prompt('Copy this and paste to Claude to save as default:', json);
+          });
         },
       },
     ],

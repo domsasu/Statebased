@@ -1,11 +1,11 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { VARIANT_LAYOUTS, LayoutItem, VariantId } from '../config/variantLayouts';
 
 const STORAGE_KEY = 'proto-layout-order';
 
 function loadFromStorage(): Record<VariantId, LayoutItem[]> {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
   return {};
@@ -13,8 +13,14 @@ function loadFromStorage(): Record<VariantId, LayoutItem[]> {
 
 function saveToStorage(orders: Record<VariantId, LayoutItem[]>) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
   } catch {}
+}
+
+declare global {
+  interface Window {
+    __getProtoLayouts?: () => Record<VariantId, LayoutItem[]>;
+  }
 }
 
 type LayoutOrderContextValue = {
@@ -26,6 +32,11 @@ const LayoutOrderContext = createContext<LayoutOrderContextValue | null>(null);
 
 export function LayoutOrderProvider({ children }: { children: React.ReactNode }) {
   const [overrides, setOverrides] = useState<Record<VariantId, LayoutItem[]>>(loadFromStorage);
+
+  useEffect(() => {
+    window.__getProtoLayouts = () => overrides;
+    return () => { delete window.__getProtoLayouts; };
+  }, [overrides]);
 
   const getLayout = useCallback(
     (variantId: VariantId): LayoutItem[] =>

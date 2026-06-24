@@ -176,8 +176,10 @@ const COHORT_LINE_TYPE_MS = 32;
 
 function RecommendedCourseCard({
   course,
+  hideCta,
 }: {
   course: (typeof recommendedCourses)[number];
+  hideCta?: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const fullText = cohortStatusFullText(course.cohort);
@@ -305,24 +307,19 @@ function RecommendedCourseCard({
           </div>
         </div>
 
-        {/* Why recommended */}
-        {course.isTopRecommendation && (
-          <button type="button" className="flex items-center gap-1 cds-body-tertiary text-[var(--cds-color-blue-700)] mb-2 hover:underline">
-            <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>auto_awesome</span>
-            Why is this recommended?
-          </button>
-        )}
 
         {/* Spacer to push button to bottom */}
         <div className="flex-1" />
 
         {/* CTA */}
-        <button
-          type="button"
-          className="w-full bg-[var(--cds-color-blue-700)] hover:bg-[var(--cds-color-blue-800)] text-[var(--cds-color-white)] cds-action-secondary py-2 rounded-[var(--cds-border-radius-100)] transition-colors mt-2"
-        >
-          Enroll for free
-        </button>
+        {!hideCta && (
+          <button
+            type="button"
+            className="w-full bg-[var(--cds-color-blue-700)] hover:bg-[var(--cds-color-blue-800)] text-[var(--cds-color-white)] cds-action-secondary py-2 rounded-[var(--cds-border-radius-100)] transition-colors mt-2"
+          >
+            Enroll for free
+          </button>
+        )}
       </div>
     </div>
   );
@@ -1159,13 +1156,15 @@ export const Home: React.FC<HomeProps> = ({
                   </>
                 ) : 'Google Course'}
               </p>
+              {!(experiment === 'd' && !isMidFi) && (
               <div className="flex flex-wrap items-center gap-3">
                 <span className="cds-title-xs text-[var(--cds-color-grey-900)] underline text-left">
                   {courseData.title}
                 </span>
               </div>
+              )}
               {/* Course progress: bar + label to the right */}
-              <div id="proto-course-progress" className="mt-[12pt] flex w-full max-w-[560px] items-center gap-3">
+              {!(experiment === 'd' && !isMidFi) && <div id="proto-course-progress" className="mt-[12pt] flex w-full max-w-[560px] items-center gap-3">
                 <div className="h-2 w-full max-w-[296px] min-w-0 shrink bg-[var(--cds-color-grey-200)] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[var(--cds-color-green-700)] rounded-full transition-all duration-300 ease-out"
@@ -1180,17 +1179,88 @@ export const Home: React.FC<HomeProps> = ({
                 <p className="cds-body-primary shrink-0 text-base text-[var(--cds-color-grey-975)]">
                   {displayedPercentage}% Course complete
                 </p>
-              </div>
+              </div>}
             </div>
           </div>}
 
           {(() => {
+            const renderAiSearchUnblocking = () => (
+              <div
+                role="region"
+                aria-label="AI Search/Unblocking"
+                className="flex flex-col gap-3 bg-[var(--cds-color-white)] border border-[var(--cds-color-grey-200)] rounded-[var(--cds-border-radius-200)] p-4 self-start"
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="material-symbols-rounded text-[var(--cds-color-purple-600)]"
+                    style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}
+                  >auto_awesome</span>
+                  <span className="cds-subtitle-sm text-[var(--cds-color-grey-975)]">Stuck? Ask AI</span>
+                </div>
+
+                <div className="flex items-center gap-2 bg-[var(--cds-color-grey-25)] border border-[var(--cds-color-grey-200)] rounded-[var(--cds-border-radius-100)] px-3 py-2">
+                  <span className="material-symbols-rounded text-[var(--cds-color-grey-400)] shrink-0" style={{ fontSize: '18px' }}>search</span>
+                  <span className="cds-body-secondary text-[var(--cds-color-grey-400)] flex-1">What are you trying to learn?</span>
+                  <button
+                    type="button"
+                    className="shrink-0 flex items-center gap-1 bg-[var(--cds-color-blue-700)] hover:bg-[var(--cds-color-blue-800)] text-white px-3 py-1 rounded-[var(--cds-border-radius-100)] cds-body-tertiary transition-colors"
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                    Ask
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  {[
+                    { icon: 'help', label: 'Why is this concept hard for me?' },
+                    { icon: 'arrow_forward', label: 'What should I learn next?' },
+                    { icon: 'lightbulb', label: 'Explain this in simpler terms' },
+                  ].map((s) => (
+                    <button
+                      key={s.label}
+                      type="button"
+                      className="flex items-center gap-2 px-3 py-2 rounded-[var(--cds-border-radius-100)] bg-[var(--cds-color-grey-25)] hover:bg-[var(--cds-color-blue-25)] border border-[var(--cds-color-grey-100)] hover:border-[var(--cds-color-blue-200)] text-left transition-colors"
+                    >
+                      <span className="material-symbols-rounded text-[var(--cds-color-grey-500)]" style={{ fontSize: '16px' }}>{s.icon}</span>
+                      <span className="cds-body-secondary text-[var(--cds-color-grey-700)]">{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+
             const renderHeroItem = (item: LayoutItem, isCondensed: boolean) => {
               if (item.name === 'Enrolled course') {
                 return isCondensed ? renderEnrolledCourseCondensed() : renderEnrolledCourseFull();
               }
               if (item.name === 'Goals and motivation') {
                 return renderGoalsAndMotivation();
+              }
+              if (item.name === 'AI Search/Unblocking') {
+                return renderAiSearchUnblocking();
+              }
+              if (item.name === 'Course recommendations') {
+                return (
+                  <div role="region" aria-label="Course recommendations" className="p-4">
+                    <h2 className="cds-subtitle-lg text-[var(--cds-color-grey-975)] mb-3">Recommended courses</h2>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h2 className="cds-subtitle-sm text-[var(--cds-color-grey-975)]">
+                        Master SQL as a <span className="underline">data analyst</span>
+                      </h2>
+                      <button className="flex items-center gap-1 cds-action-secondary text-[var(--cds-color-blue-700)] hover:underline">
+                        <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>auto_awesome</span>
+                        Edit
+                      </button>
+                    </div>
+                    <div className="flex gap-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                      {recommendedCourses.slice(0, 4).map((course) => (
+                        <div key={course.id} className="w-[220px] shrink-0">
+                          <RecommendedCourseCard course={course} hideCta />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
               }
               // Fallback for white-area items dragged into the hero
               return <RegionPlaceholder name={item.name} />;
